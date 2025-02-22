@@ -1,0 +1,58 @@
+/my-api
+ ├── /routes
+ │   ├── users.routes.js
+ │   ├── expenses.routes.js
+ ├── /controllers
+ │   ├── users.controller.js
+ │   ├── expenses.controller.js
+ ├── /services
+ │   ├── users.service.js
+ │   ├── expenses.service.js
+ ├── /repositories
+ │   ├── users.repository.js
+ │   ├── expenses.repository.js
+ ├── /models
+ │   ├── user.model.js
+ │   ├── expense.model.js
+ ├── /middleware
+ │   ├── authMiddleware.js
+ ├── /config
+ │   ├── db.js
+ ├── server.js
+
+
+ id: uuid
+ Description: string
+ Type: string
+ Amount: decimal
+ Transaction Type: enum
+ Date: date
+ Status: enum
+
+ id:
+ email:
+ hashpassword:
+
+
+ Services:
+ 1. Montly leftover expenses[Display on Homepage];
+ 2. Currency converter API [front-end];
+ 3. Split expense with family;
+ 4. Recurring expense;
+
+
+ Knowledge gap: 
+ 
+ Understand how the model is initialized (i.e. extend and init)
+ Add Delete logic from react side
+
+ Left:
+ 1. Sorting & Pagination
+ 2. Views(list page) - update on paid status change[diappear], add loading via tryC
+ 3. Add loading via tryCatchFinally to List Page, HomePage, Edit and view expense pages
+ 3. User authentication and authorization
+ 4. Homepage
+
+
+ 
+
