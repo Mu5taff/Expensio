@@ -27,10 +27,15 @@ async function postExpense(formData) {
   }
 }
 
-async function getAllExpenses(status) {
-  const queryParam = status ? `?status=${status}` : "";
+async function getAllExpenses({ status, date }) {
+  const queryParams = new URLSearchParams();
+
+  if (status) queryParams.append("status", status);
+  if (date) queryParams.append("date", date);
+
+  const url = queryParams.toString() ? `${baseURL}?${queryParams}` : baseURL;
   try {
-    const response = await fetch(`${baseURL}${queryParam}`, {
+    const response = await fetch(`${url}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -7,7 +7,10 @@ class ExpensesRepository {
   }
 
   async getAllExpenses(queryParams) {
-    return Expense.findAll(queryParams);
+    return Expense.findAll({
+      ...queryParams, // Keep existing query params unchanged
+      order: [["dueDate", "DESC"]], // Always return sorted results
+    });
   }
 
   async getExpenseById(id) {

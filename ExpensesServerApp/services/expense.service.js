@@ -1,6 +1,7 @@
 import { ValidationError } from "sequelize";
 import ExpensesRepository from "../repositories/expenses.repository.js";
 import { InvalidStateTransitionError, NotFoundError } from "../Util/errors.js";
+import { Op } from "sequelize";
 
 class ExpenseService {
   async createExpense(reqData) {
@@ -35,11 +36,37 @@ class ExpenseService {
     return ExpenseStatus;
   }
 
-  async displayAllExpense(status) {
+  async displayAllExpense(status, date) {
     const queryOptions = { where: {} };
 
     if (status && status !== "all") {
       queryOptions.where.isPaid = status === "paid";
+    }
+
+    if (date === "upcoming") {
+      const thisMonthDate = new Date();
+      thisMonthDate.setDate(1);
+      const futureMonthDate = new Date(thisMonthDate);
+      futureMonthDate.setMonth(futureMonthDate.getMonth() + 1);
+
+      const thisMonthDateStr = thisMonthDate.toISOString().split("T")[0];
+      const futureMonthDateStr = futureMonthDate.toISOString().split("T")[0];
+
+      queryOptions.where.dueDate = {
+        [Op.gte]: thisMonthDateStr,
+        [Op.lt]: futureMonthDateStr,
+      };
+    }
+
+    if (date === "past") {
+      const thisMonthDate = new Date();
+      thisMonthDate.setDate(1);
+
+      const thisMonthDateStr = thisMonthDate.toISOString().split("T")[0];
+
+      queryOptions.where.dueDate = {
+        [Op.lt]: thisMonthDateStr,
+      };
     }
 
     const expenses = await ExpensesRepository.getAllExpenses(queryOptions);
@@ -47,6 +74,8 @@ class ExpenseService {
     if (expenses.length === 0) {
       return [];
     }
+
+    console.log(queryOptions);
 
     return expenses;
   }

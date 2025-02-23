@@ -5,40 +5,46 @@ import { Link } from "react-router-dom";
 import api from "../../../utilities/api.js";
 import Loader from "../ui/Loader.jsx";
 
-function Table({ expenses, setExpenses, paidStatus, setPaidStatus, view }) {
+function Table({ expenses, setExpenses, statusFilter, dateFilter }) {
   // States
-  const [loading, setLoading] = useState(false);
   const [sortColumn, setSortColumn] = useState(null);
   const [isAscending, setIsAscending] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Logic Functions
-  async function fetchExpensesList(filter) {
+
+  async function fetchExpensesList(statusFilter, dateFilter) {
     setLoading(true); // ✅ Start loading
     try {
-      const data = await api.getAllExpenses(filter);
+      const data = await api.getAllExpenses({
+        status: statusFilter,
+        date: dateFilter,
+      });
       setExpenses(data.length > 0 ? data : []);
     } catch (error) {
       console.error("Error fetching expenses:", error);
     } finally {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 300);
     }
   }
 
   useEffect(() => {
-    fetchExpensesList(view);
-  }, [view, paidStatus]);
+    fetchExpensesList(statusFilter, dateFilter);
+  }, [statusFilter]);
 
   async function onToggle(id, status) {
     const newStatus = !status;
     const previousExpenses = expenses;
-    setExpenses((prevExpenses) =>
-      prevExpenses.map((expense) => {
-        return expense.id === id ? { ...expense, isPaid: newStatus } : expense;
-      })
-    );
+    setExpenses((prevExpenses) => {
+      let updatedExpenses = prevExpenses.map((expense) =>
+        expense.id === id ? { ...expense, isPaid: newStatus } : expense
+      );
+
+      setExpenses(updatedExpenses);
+    });
+
     try {
       await api.updateExpenseStatus(id, newStatus);
-      setPaidStatus((prev) => prev + 1);
     } catch (err) {
       console.error({ Error: err.message });
       setExpenses(previousExpenses);
@@ -237,34 +243,31 @@ function Table({ expenses, setExpenses, paidStatus, setPaidStatus, view }) {
 
   return (
     <>
-      <div className="card shadow-lg rounded-4 p-3">
-        <div className="table-responsive-md">
-          {loading ? (
-            <Loader />
-          ) : (
-            <table className="table table-hover table-striped">
-              <TableHeader />
-              <tbody>
-                {expenses.map((expense) => {
-                  return (
-                    <TableRow
-                      key={expense.id}
-                      item={expense}
-                      onToggle={onToggle}
-                      handleDelete={handleDelete}
-                    />
-                  );
-                })}
-                {!expenses.length && (
-                  <tr className="text-center">
-                    <td className="py-4" colSpan="6">
-                      No Expenses Found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
+      <div className="card shadow-lg rounded-4 p-3 position-relative">
+        {loading && (
+          <Loader className="position-absolute top-50 start-50 translate-middle" />
+        )}
+        <div className={`table-responsive-md ${loading ? "opacity-50" : ""}`}>
+          <table className="table table-hover table-striped">
+            <TableHeader />
+            <tbody>
+              {expenses.map((expense) => (
+                <TableRow
+                  key={expense.id}
+                  item={expense}
+                  onToggle={onToggle}
+                  handleDelete={handleDelete}
+                />
+              ))}
+              {!expenses.length && !loading && (
+                <tr className="text-center">
+                  <td className="py-4" colSpan="6">
+                    No Expenses Found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </>

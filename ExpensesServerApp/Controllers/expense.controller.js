@@ -4,7 +4,8 @@ class ExpenseController {
   async displayAllExpenses(req, res) {
     try {
       const status = req.query.status;
-      const allExpenses = await ExpenseService.displayAllExpense(status);
+      const date = req.query.date;
+      const allExpenses = await ExpenseService.displayAllExpense(status, date);
 
       res.status(200).json(allExpenses);
     } catch (error) {

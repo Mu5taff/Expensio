@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 function ExpenseListPage() {
   const [expenses, setExpenses] = useState([]);
   const [view, setView] = useState("All");
-  const [paidStatus, setPaidStatus] = useState(0);
 
   function ExpenseHeader() {
     return (
@@ -75,9 +74,7 @@ function ExpenseListPage() {
       <Table
         expenses={expenses}
         setExpenses={setExpenses}
-        paidStatus={paidStatus}
-        setPaidStatus={setPaidStatus}
-        view={view.toLowerCase() || ""}
+        statusFilter={view.toLowerCase()}
       />
     </div>
   );
