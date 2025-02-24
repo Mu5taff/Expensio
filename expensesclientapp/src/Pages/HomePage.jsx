@@ -26,7 +26,7 @@ function HomePage() {
         <Table
           expenses={dueExpenses}
           setExpenses={setDueExpenses}
-          statusFilter={"paid"}
+          statusFilter={"unpaid"}
           dateFilter={"past"}
         />
       </div>
