@@ -1,3 +1,8 @@
+import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext.jsx"; // ✅ Import useAuth
+import api from "../../utilities/api.js";
+
 function RegisterPage() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -6,10 +11,13 @@ function RegisterPage() {
     confirmPassword: "",
   });
 
+  const navigate = useNavigate();
+  const { setAccessToken } = useAuth(); // ✅ Get global auth state
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+
     if (e.target.id === "confirmPassword") {
       setError(
         formData.password !== e.target.value ? "Passwords do not match!" : ""
@@ -17,13 +25,26 @@ function RegisterPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // ✅ Clear previous errors
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
       return;
     }
-    alert("Account Created Successfully!");
+
+    try {
+      await api.register(
+        formData.fullName,
+        formData.email,
+        formData.password,
+        setAccessToken
+      );
+      navigate("/expenses"); // ✅ Redirect after successful registration
+    } catch (error) {
+      setError(error.message); // ✅ Show error message inline
+    }
   };
 
   return (
@@ -34,6 +55,9 @@ function RegisterPage() {
         </div>
         <div className="card-body">
           <form onSubmit={handleSubmit}>
+            {/* ✅ Show error messages inline */}
+            {error && <p className="text-danger text-center">{error}</p>}
+
             <div className="mb-3">
               <label htmlFor="fullName" className="form-label">
                 Full Name
@@ -104,18 +128,13 @@ function RegisterPage() {
             </div>
 
             <p className="text-center mt-3">
-              Already have an account?{" "}
-              <a href="#" className="text-success">
-                Login
-              </a>
+              Already have an account? <Link to="/login">Login</Link>
             </p>
           </form>
         </div>
       </div>
     </div>
   );
-}
-{
 }
 
 export default RegisterPage;

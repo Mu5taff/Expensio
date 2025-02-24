@@ -1,27 +1,28 @@
-function SignInPage() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-  });
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import api from "../../utilities/api";
 
+function LoginPage() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { setAccessToken } = useAuth(); //  Use global auth state
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    // if (e.target.id === "confirmPassword") {
-    setError(
-      formData.password !== e.target.value ? "Passwords do not match!" : ""
-    );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (formData.password !== formData.confirmPassword) {
-    //   setError("Passwords do not match!");
-    //   return;
-    // }
-    // alert("Account Created Successfully!");
+    setError(""); //  Clear errors on new submission
+
+    try {
+      await api.login(formData.email, formData.password, setAccessToken); //  Pass setAccessToken
+      navigate("/expenses"); //  Redirect after successful login
+    } catch (error) {
+      setError(error.message); //  Show error message inline
+    }
   };
 
   return (
@@ -32,6 +33,9 @@ function SignInPage() {
         </div>
         <div className="card-body">
           <form onSubmit={handleSubmit}>
+            {/*  Show error messages inline */}
+            {error && <p className="text-danger text-center">{error}</p>}
+
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
                 Email Address
@@ -57,7 +61,7 @@ function SignInPage() {
                 id="password"
                 placeholder="Enter password"
                 value={formData.password}
-                onChange={() => handleChange()}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -71,10 +75,7 @@ function SignInPage() {
             </div>
 
             <p className="text-center mt-3">
-              Don't have an account?{" "}
-              <a href="#" className="text-success">
-                Register
-              </a>
+              Don't have an account? <Link to="/register">Register</Link>
             </p>
           </form>
         </div>
@@ -83,4 +84,4 @@ function SignInPage() {
   );
 }
 
-export default SignInPage;
+export default LoginPage;

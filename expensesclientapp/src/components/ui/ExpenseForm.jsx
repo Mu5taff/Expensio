@@ -2,22 +2,21 @@ import { useState, useEffect } from "react";
 import "../../index.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../../../utilities/api.js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx"; // ✅ Import useAuth
 
 function ExpenseForm({ data, form }) {
   const [formData, setFormData] = useState(data || []);
   const [errors, setErrors] = useState({});
   const [isDisabled, setIsDisabled] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // ✅ New state for API errors
 
   const navigate = useNavigate();
+  const { setAccessToken, accessToken } = useAuth(); // ✅ Get setAccessToken from AuthContext
 
   useEffect(() => {
-    if (form === "view") {
-      setIsDisabled(true);
-    } else {
-      setIsDisabled(false);
-    }
-  }, []);
+    setIsDisabled(form === "view");
+  }, [form]);
 
   const formatFieldName = (camelCase) => {
     return camelCase
@@ -32,7 +31,6 @@ function ExpenseForm({ data, form }) {
 
     Object.keys(formData).forEach((element) => {
       if (typeof formData[element] === "boolean") return;
-
       if (element === "recurringEndDate" && !formData.isRecurring) return;
       if (formData[element] === "" || formData[element] <= 0) {
         newErrors[element] = `Please fill in the ${formatFieldName(element)}`;
@@ -41,20 +39,20 @@ function ExpenseForm({ data, form }) {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      console.log(newErrors);
       return;
     }
 
     setErrors({});
-    if (form === "edit") {
-      await api.updateExpense(formData);
-    } else if (form === "new") {
-      await api.postExpense(formData);
+    try {
+      if (form === "edit") {
+        await api.updateExpense(formData, setAccessToken);
+      } else if (form === "new") {
+        await api.postExpense(formData, setAccessToken);
+      }
+      navigate("/expenses");
+    } catch (error) {
+      setErrorMessage(error.message); // ✅ Display API errors
     }
-
-    navigate("/expenses");
-
-    console.log(formData);
   };
 
   const handleChange = (e) => {
@@ -62,12 +60,11 @@ function ExpenseForm({ data, form }) {
 
     if (e.target.type === "number") {
       if (/^\d*\.?\d{0,2}$/.test(elementValue)) {
-        // Convert to number & format to 1 decimal place if needed
         if (elementValue.includes(".")) {
-          elementValue = parseFloat(elementValue).toString(); // Remove extra trailing zeros
+          elementValue = parseFloat(elementValue).toString();
         }
       } else {
-        return; // Prevent invalid input
+        return;
       }
     }
 
@@ -88,7 +85,6 @@ function ExpenseForm({ data, form }) {
     }
 
     setErrors(newErrors);
-    console.log(e.target.value);
   };
 
   return (
@@ -98,6 +94,10 @@ function ExpenseForm({ data, form }) {
           <h4 className="mb-0">Expense Form</h4>
         </div>
         <div className="card-body">
+          {errorMessage && (
+            <div className="alert alert-danger">{errorMessage}</div>
+          )}{" "}
+          {/* ✅ Display API errors */}
           <form id="expenseForm" onSubmit={handleSubmit} noValidate>
             <div className="mb-3">
               <label htmlFor="description" className="form-label">
@@ -187,7 +187,7 @@ function ExpenseForm({ data, form }) {
             </div>
 
             <div className="mb-3">
-              <label htmlFor="type" className="form-label">
+              <label htmlFor="category" className="form-label">
                 Category
               </label>
               <select
@@ -269,9 +269,12 @@ function ExpenseForm({ data, form }) {
 
             {!isDisabled && (
               <div className="d-flex justify-content-end">
-                <button type="submit" className="btn btn-success">
+                <button type="submit" className="btn btn-success mx-3">
                   Save Expense
                 </button>
+                <Link to={"/expenses"}>
+                  <button className="btn btn-danger">Close</button>
+                </Link>
               </div>
             )}
           </form>

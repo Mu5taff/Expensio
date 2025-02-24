@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../../index.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Link } from "react-router-dom";
+import LogoutButton from "./LogoutBtn";
 
 function NavBar() {
   return (
@@ -38,7 +39,7 @@ function NavBar() {
               </li>
             </ul>
 
-            <button className="btn btn-danger ms-lg-3">Logout</button>
+            <LogoutButton className="btn btn-danger ms-lg-3" />
           </div>
         </div>
       </nav>

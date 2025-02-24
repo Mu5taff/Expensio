@@ -1,42 +1,32 @@
-import { ValidationError } from "sequelize";
 import ExpensesRepository from "../repositories/expenses.repository.js";
-import { InvalidStateTransitionError, NotFoundError } from "../Util/errors.js";
+import { NotFoundError } from "../Util/errors.js";
 import { Op } from "sequelize";
 
 class ExpenseService {
-  async createExpense(reqData) {
-    await this.validateExpenseFieldsAreFilled(reqData);
-    return await ExpensesRepository.createExpense(reqData);
+  async createExpense(userId, reqData) {
+    return await ExpensesRepository.createExpense({ ...reqData, userId });
   }
 
-  async editExpense(id, reqData) {
-    await this.validateExpenseExists(id);
-    await this.validateExpenseFieldsAreFilled(reqData);
-    return await ExpensesRepository.updateExpense(id, reqData);
+  async editExpense(id, userId, reqData) {
+    await this.validateExpenseExists(userId, id);
+    return await ExpensesRepository.updateExpense(id, userId, reqData);
   }
 
-  async viewExpense(id) {
-    await this.validateExpenseExists(id);
-    const expense = await ExpensesRepository.getExpenseById(id);
-    return expense;
+  async viewExpense(userId, id) {
+    return await this.validateExpenseExists(userId, id);
   }
 
-  async deleteExpense(id) {
-    await this.validateExpenseExists(id);
-    await ExpensesRepository.deleteExpense(id);
+  async deleteExpense(userId, id) {
+    await this.validateExpenseExists(userId, id);
+    await ExpensesRepository.deleteExpense(id, userId);
   }
 
-  async setExpensePaid(id, newStatus) {
-    await this.validateExpenseExists(id);
-    const ExpenseStatus = await ExpensesRepository.updateExpenseStatus(
-      id,
-      newStatus
-    );
-
-    return ExpenseStatus;
+  async setExpensePaid(id, userId, newStatus) {
+    await this.validateExpenseExists(userId, id);
+    return await ExpensesRepository.updateExpenseStatus(id, userId, newStatus);
   }
 
-  async displayAllExpense(status, date) {
+  async displayAllExpense(userId, status, date) {
     const queryOptions = { where: {} };
 
     if (status && status !== "all") {
@@ -44,57 +34,30 @@ class ExpenseService {
     }
 
     if (date === "upcoming") {
-      const thisMonthDate = new Date();
-      thisMonthDate.setDate(1);
-      const futureMonthDate = new Date(thisMonthDate);
-      futureMonthDate.setMonth(futureMonthDate.getMonth() + 1);
-
-      const thisMonthDateStr = thisMonthDate.toISOString().split("T")[0];
-      const futureMonthDateStr = futureMonthDate.toISOString().split("T")[0];
-
+      const today = new Date();
+      today.setDate(1);
       queryOptions.where.dueDate = {
-        [Op.gte]: thisMonthDateStr,
-        [Op.lt]: futureMonthDateStr,
+        [Op.gte]: today.toISOString().split("T")[0],
       };
     }
 
     if (date === "past") {
-      const thisMonthDate = new Date();
-      thisMonthDate.setDate(1);
-
-      const thisMonthDateStr = thisMonthDate.toISOString().split("T")[0];
-
+      const today = new Date();
+      today.setDate(1);
       queryOptions.where.dueDate = {
-        [Op.lt]: thisMonthDateStr,
+        [Op.lt]: today.toISOString().split("T")[0],
       };
     }
 
-    const expenses = await ExpensesRepository.getAllExpenses(queryOptions);
-
-    if (expenses.length === 0) {
-      return [];
-    }
-
-    console.log(queryOptions);
-
-    return expenses;
+    return await ExpensesRepository.getAllExpenses(userId, queryOptions);
   }
 
-  // Helper
-  async validateExpenseExists(id) {
-    const expense = await ExpensesRepository.getExpenseById(id);
+  async validateExpenseExists(userId, id) {
+    const expense = await ExpensesRepository.getExpenseById(id, userId);
     if (!expense) {
       throw new NotFoundError("Expense not found");
     }
-  }
-
-  async validateExpenseFieldsAreFilled(reqBody) {
-    const reqBodyValues = Object.values(reqBody);
-    await reqBodyValues.forEach((reqValue) => {
-      if (reqValue === "") {
-        throw new ValidationError(`${reqValue} is blank`);
-      }
-    });
+    return expense;
   }
 }
 

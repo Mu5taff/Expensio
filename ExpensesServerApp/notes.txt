@@ -47,11 +47,10 @@
  Add Delete logic from react side
 
  Left:
- 1. Sorting & Pagination
- 2. Views(list page) - update on paid status change[diappear], add loading via tryC
- 3. Add loading via tryCatchFinally to List Page, HomePage, Edit and view expense pages
- 3. User authentication and authorization
- 4. Homepage
+ 2. Cron Jobs
+ 3. Redo Query for getAllExpenses and rename it on backend and front end
+ 4. Display error messages from backend/front end as alerts
+
 
 
  

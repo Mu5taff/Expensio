@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/db.js";
+import User from "./user.model.js";
 
 class Expense extends Model {}
 
@@ -10,6 +11,16 @@ Expense.init(
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       primaryKey: true,
+    },
+
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
+      onDelete: "CASCADE",
     },
     description: {
       type: DataTypes.STRING,
@@ -58,5 +69,8 @@ Expense.init(
     timestamps: true, // Enables `createdAt` & `updatedAt`
   }
 );
+
+Expense.belongsTo(User, { foreignKey: "userId" });
+User.hasMany(Expense, { foreignKey: "userId" });
 
 export default Expense;

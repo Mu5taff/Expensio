@@ -20,8 +20,19 @@ function EditExpenseForm() {
         console.error("Error fetching expense:", error);
       }
     }
+
     fetchExpense();
-  }, []);
+  }, [location.state]);
+
+  if (!expense) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return <ExpenseForm data={expense} form={"edit"} />;
 }

@@ -1,4 +1,3 @@
-import { raw } from "express";
 import Expense from "../models/expense.model.js";
 
 class ExpensesRepository {
@@ -6,46 +5,36 @@ class ExpensesRepository {
     return Expense.create(reqData);
   }
 
-  async getAllExpenses(queryParams) {
+  async getAllExpenses(userId, queryParams) {
     return Expense.findAll({
-      ...queryParams, // Keep existing query params unchanged
-      order: [["dueDate", "DESC"]], // Always return sorted results
+      where: { userId, ...queryParams.where },
+      order: [["dueDate", "DESC"]],
     });
   }
 
-  async getExpenseById(id) {
-    const expense = await Expense.findByPk(id);
-    return expense;
+  async getExpenseById(id, userId) {
+    return Expense.findOne({ where: { id, userId } });
   }
 
-  async updateExpense(expenseId, expense) {
+  async updateExpense(expenseId, userId, expense) {
     await Expense.update(expense, {
-      where: {
-        id: expenseId,
-      },
+      where: { id: expenseId, userId },
     });
 
-    return Expense.findByPk(expenseId);
+    return Expense.findOne({ where: { id: expenseId, userId } });
   }
 
-  async updateExpenseStatus(expenseId, expenseStatus) {
+  async updateExpenseStatus(expenseId, userId, expenseStatus) {
     await Expense.update(
       { isPaid: expenseStatus },
-      {
-        where: {
-          id: expenseId,
-        },
-      }
+      { where: { id: expenseId, userId } }
     );
-    return Expense.findByPk(expenseId);
+
+    return Expense.findOne({ where: { id: expenseId, userId } });
   }
 
-  async deleteExpense(expenseId) {
-    await Expense.destroy({
-      where: {
-        id: expenseId,
-      },
-    });
+  async deleteExpense(expenseId, userId) {
+    await Expense.destroy({ where: { id: expenseId, userId } });
   }
 }
 
