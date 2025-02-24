@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Table from "../components/ui/Table.jsx";
-import api from "../../utilities/api.js";
 import { Link } from "react-router-dom";
 
 function ExpenseListPage() {

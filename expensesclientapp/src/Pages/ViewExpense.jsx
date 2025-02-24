@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import api from "../../utilities/api";
 import ExpenseForm from "../components/ui/ExpenseForm";
 
 function ViewExpense() {

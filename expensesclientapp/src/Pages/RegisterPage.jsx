@@ -1,6 +1,6 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext.jsx"; // ✅ Import useAuth
+import { useAuth } from "../context/AuthContext.jsx";
 import api from "../../utilities/api.js";
 
 function RegisterPage() {
@@ -12,7 +12,7 @@ function RegisterPage() {
   });
 
   const navigate = useNavigate();
-  const { setAccessToken } = useAuth(); // ✅ Get global auth state
+  const { setAccessToken } = useAuth();
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -27,7 +27,7 @@ function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // ✅ Clear previous errors
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
@@ -41,9 +41,9 @@ function RegisterPage() {
         formData.password,
         setAccessToken
       );
-      navigate("/expenses"); // ✅ Redirect after successful registration
+      navigate("/expenses"); //
     } catch (error) {
-      setError(error.message); // ✅ Show error message inline
+      setError(error.message); //
     }
   };
 
@@ -55,7 +55,7 @@ function RegisterPage() {
         </div>
         <div className="card-body">
           <form onSubmit={handleSubmit}>
-            {/* ✅ Show error messages inline */}
+            {/*  Show error messages inline */}
             {error && <p className="text-danger text-center">{error}</p>}
 
             <div className="mb-3">

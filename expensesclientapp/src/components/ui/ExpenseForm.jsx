@@ -3,16 +3,16 @@ import "../../index.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../../../utilities/api.js";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx"; // ✅ Import useAuth
+import { useAuth } from "../../context/AuthContext.jsx"; //  Import useAuth
 
 function ExpenseForm({ data, form }) {
   const [formData, setFormData] = useState(data || []);
   const [errors, setErrors] = useState({});
   const [isDisabled, setIsDisabled] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // ✅ New state for API errors
+  const [errorMessage, setErrorMessage] = useState(""); //  New state for API errors
 
   const navigate = useNavigate();
-  const { setAccessToken, accessToken } = useAuth(); // ✅ Get setAccessToken from AuthContext
+  const { setAccessToken, accessToken } = useAuth(); //  Get setAccessToken from AuthContext
 
   useEffect(() => {
     setIsDisabled(form === "view");
@@ -51,7 +51,7 @@ function ExpenseForm({ data, form }) {
       }
       navigate("/expenses");
     } catch (error) {
-      setErrorMessage(error.message); // ✅ Display API errors
+      setErrorMessage(error.message); // Display API errors
     }
   };
 
@@ -97,7 +97,7 @@ function ExpenseForm({ data, form }) {
           {errorMessage && (
             <div className="alert alert-danger">{errorMessage}</div>
           )}{" "}
-          {/* ✅ Display API errors */}
+          {/* Display API errors */}
           <form id="expenseForm" onSubmit={handleSubmit} noValidate>
             <div className="mb-3">
               <label htmlFor="description" className="form-label">

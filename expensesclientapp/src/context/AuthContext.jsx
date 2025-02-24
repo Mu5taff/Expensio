@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
       const success = await api.login(email, password);
       if (success) {
         setAccessToken(success.accessToken);
-        localStorage.setItem("accessToken", success.accessToken); // ✅ Store in localStorage
+        localStorage.setItem("accessToken", success.accessToken); //  Store in localStorage
       }
       return success;
     } catch (error) {
@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{ accessToken, setAccessToken, login, logout }}
     >
-      {!isLoading && children} {/* ✅ Prevent rendering before checking auth */}
+      {!isLoading && children} {/*  Prevent rendering before checking auth */}
     </AuthContext.Provider>
   );
 }

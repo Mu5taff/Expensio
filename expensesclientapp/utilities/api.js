@@ -1,4 +1,4 @@
-const coreBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"; // Default to local dev
+const coreBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 const baseURL = `${coreBase}/api`;
 const baseExpenseURL = `${baseURL}/expenses`;
@@ -12,7 +12,7 @@ async function fetchWithAuth(url, options = {}, setAccessToken, retry = true) {
   if (accessToken) {
     options.headers["Authorization"] = `Bearer ${accessToken}`;
   } else {
-    console.warn(`🔴 No Access Token provided for ${url}`);
+    console.warn(` No Access Token provided for ${url}`);
   }
 
   options.credentials = "include"; //  Ensure cookies (refresh token) are sent
@@ -21,7 +21,7 @@ async function fetchWithAuth(url, options = {}, setAccessToken, retry = true) {
     const response = await fetch(url, options);
 
     if ((response.status === 401 || response.status === 403) && retry) {
-      console.warn("🔴 Access token expired. Attempting to refresh...");
+      console.warn(" Access token expired. Attempting to refresh...");
       const refreshedToken = await refreshAccessToken(setAccessToken);
       if (refreshedToken) {
         return fetchWithAuth(url, options, setAccessToken, false); // Retry with new token
@@ -43,7 +43,7 @@ async function fetchWithAuth(url, options = {}, setAccessToken, retry = true) {
 }
 
 /**
- * 🔹 Refresh Access Token (Now Works With HTTP-Only Cookies)
+ *  Refresh Access Token (Now Works With HTTP-Only Cookies)
  */
 async function refreshAccessToken(setAccessToken) {
   try {
@@ -57,28 +57,28 @@ async function refreshAccessToken(setAccessToken) {
     }
 
     const data = await response.json();
-    localStorage.setItem("accessToken", data.accessToken); // ✅ Update localStorage
-    setAccessToken(data.accessToken); // ✅ Update global state
+    localStorage.setItem("accessToken", data.accessToken); //  Update localStorage
+    setAccessToken(data.accessToken); // Update global state
 
-    console.log("🟢 Access token refreshed!");
+    console.log(" Access token refreshed!");
     return data.accessToken;
   } catch (error) {
-    console.error("🔴 Refresh token failed:", error.message);
-    localStorage.removeItem("accessToken"); // ✅ Remove expired token
+    console.error(" Refresh token failed:", error.message);
+    localStorage.removeItem("accessToken"); // Remove expired token
     setAccessToken(null);
     return null;
   }
 }
 
 /**
- * 🔹 User Registration
+ *  User Registration
  */
 async function register(username, email, password, setAccessToken) {
   const response = await fetch(`${baseURL}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, email, password }),
-    credentials: "include", // ✅ Ensure refresh token is set in cookies
+    credentials: "include", // Ensure refresh token is set in cookies
   });
 
   const data = await response.json();
@@ -98,7 +98,7 @@ async function login(email, password, setAccessToken) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
-    credentials: "include", // ✅ Ensures refresh token is stored in cookies
+    credentials: "include", //  Ensures refresh token is stored in cookies
   });
 
   const data = await response.json();
@@ -113,7 +113,7 @@ async function login(email, password, setAccessToken) {
 }
 
 /**
- * 🔹 Logout (Now Clears Refresh Token Properly)
+ *  Logout (Now Clears Refresh Token Properly)
  */
 async function logout(setAccessToken) {
   await fetch(`${baseURL}/auth/logout`, {
@@ -121,11 +121,11 @@ async function logout(setAccessToken) {
     credentials: "include", // Clears HTTP-only refresh token
   });
 
-  localStorage.removeItem("accessToken"); // ✅ Remove token from localStorage
+  localStorage.removeItem("accessToken"); //  Remove token from localStorage
 }
 
 /**
- * 🔹 Expense APIs (Requires Auth)
+ *  Expense APIs (Requires Auth)
  */
 async function postExpense(formData, setAccessToken) {
   formData.amount = Number(formData.amount);
@@ -187,7 +187,7 @@ async function deleteExpense(id, accessToken, setAccessToken) {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     },
-    accessToken, // ✅ Pass `accessToken`
+    accessToken, //  Pass `accessToken`
     setAccessToken
   );
 }

@@ -4,7 +4,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { Link } from "react-router-dom";
 import api from "../../../utilities/api.js";
 import Loader from "../ui/Loader.jsx";
-import { useAuth } from "../../context/AuthContext.jsx"; // ✅ Import useAuth
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function Table({ expenses, setExpenses, statusFilter, dateFilter }) {
   // States
@@ -50,7 +50,7 @@ function Table({ expenses, setExpenses, statusFilter, dateFilter }) {
       await api.updateExpenseStatus(id, newStatus, setAccessToken); //  Pass setAccessToken
     } catch (err) {
       console.error("Error updating status:", err);
-      setExpenses(previousExpenses); // ✅ Revert changes on failure
+      setExpenses(previousExpenses); //  Revert changes on failure
       setErrorMessage("Failed to update expense status.");
     }
   }
@@ -102,7 +102,7 @@ function Table({ expenses, setExpenses, statusFilter, dateFilter }) {
         {errorMessage && (
           <div className="alert alert-danger">{errorMessage}</div>
         )}{" "}
-        {/* ✅ Show errors */}
+        {/* Show errors */}
         {/* Loader - Centered Over the Table */}
         {loading && (
           <div
