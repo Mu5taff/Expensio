@@ -1,4 +1,6 @@
-const baseURL = "http://localhost:3000/api";
+const coreBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"; // Default to local dev
+
+const baseURL = `${coreBase}/api`;
 const baseExpenseURL = `${baseURL}/expenses`;
 
 //Generic Fetch Wrapper with Automatic Token Refresh
